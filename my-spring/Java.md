@@ -698,7 +698,7 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ##### 	1、IOC（Inversion of Control）：一种设计思想
 
-​		**控制反转**。将对象交给spring容器去控制管理。
+​		**控制反转**。将对象交给spring容器去创建管理。
 
 ##### 	2、DI（Dependency Injection）
 
