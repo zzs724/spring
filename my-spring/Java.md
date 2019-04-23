@@ -681,13 +681,28 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 ​	BeanFactory和ApplicationContext是Spring的两大核心接口。都可以作为Spring的容器
 
 1. **ApplicationContext实现了BeanFactory。**
+
 2. BeanFactory是Spring最底层的接口。包含：各种Bean的定义、读取Bean配置文档、管理Bean的加载、实例化、控制Bean的生命周期、维护Bean之间的依赖关系。
+
 3. ApplicationContext还实现了：支持国际化、统一的资源文件访问、同时加载多个配置文件、
+
 4. **BeanFactory采用延迟加载来创建Bean，ApplicationContext是在容器启动时一次性创建所有Bean**，所以ApplicationContext会导致Bean过多时，容器启动慢
+
 5. BeanFactory和ApplicationContext都支持BeanPostProcessor、BeanFactoryPostProcessor的使用。BeanFactory需要手动注册，而ApplicationContext则是自动注册
+
 6. BeanFactory通常以编程的方式被创建，ApplicationContext还能以声明的方式创建，如使用ContextLoader
 
+   
 
+### 七、Spring的IOC和DI
+
+##### 	1、IOC（Inversion of Control）：一种设计思想
+
+​		**控制反转**。将对象交给spring容器去控制管理。
+
+##### 	2、DI（Dependency Injection）
+
+​		**依赖注入**。依赖spring容器把组件需要的资源注入。
 
 
 
