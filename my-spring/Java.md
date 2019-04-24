@@ -706,7 +706,9 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 3. **AnnotationConfigApplicationContext**
 
-   ​	读取**注解**创建容器
+   ​	读取**注解**创建容器    new AnnotationConfigApplicationContext(XXXconfig.class)将XXXconfig.class标注为一个Spring的配置类等同于加了注解@Configuration 的XXXconfig.class。
+
+   也可以在一个  配置类上添加@Import（XXXconfig.class），XXXconfig.class也被标注成为配置类
 
    
 
@@ -781,6 +783,8 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 2. **构造器**:可以保证在Bean实例化时就可以将值设置。
 
+   即使用不到构造函数中的参数也必须在xml中赋值初始化
+
    **（1）按类型匹配入参**
 
    ```java
@@ -840,7 +844,7 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 3. **注解**
 
-   ### 当有多个相同类型的bean，可以**@Qualifier**去指定
+   ### 当有多个相同类型的bean，可以**@Qualifier**去指定Bean的id
 
    开启注解功能：
 
@@ -850,19 +854,19 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
    **使用：@Autowired或@Resource**
 
-   **@Autowired**
-
    ```java
+   @Autowired
    private ICommonDao commonDao;
    
    @Resource
-   
    private IXxxxDao xxxxDao;
    ```
 
-   **注：@Autowired：根据对象类型去匹配**
+   **注：@Autowired：根据对象类型去匹配**，如果一个都没有则报错。
 
-   ​	**@Resource：根据名称去匹配，没有找到名称则会根据类型去匹配**
+   ​				如果有多个的话会根据Bean的Id为commonDao去匹配;
+
+   ​	**@Resource：根据名称（bean的id）去匹配，没有找到名称则会根据类型去匹配**
 
 ###### 2、自动装配
 
@@ -1115,7 +1119,9 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ### 十二、Spring Bean的生命周期
 
+​	1、单例对象生命周期：当容器启动时，创建bean对象，当容器销毁时，bean对象消亡
 
+​	2、多例对象生命周期：容器启动后，当使用bean对象时，创建bean对象，当对象长时间不用且没有对象引用，有GC回收
 
 
 
