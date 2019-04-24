@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- 默认使用构造方法创建，必须有空的构造方法 -->
+    <!--<bean id="helloService" class="com.zzs.service.impl.HelloServiceImpl" />-->
+    <!-- 非静态方法 -->
+    <!--
+    <bean id="myFactory" class="com.zzs.factory.MyFactory" />
+    <bean id="helloService" factory-bean="myFactory" factory-method="getHelloService"/>
+    -->
+
+    <!-- 静态方法创建 -->
+    <bean id="helloService" class="com.zzs.factory.MyFactory" factory-method="getHelloService"/>
+</beans>

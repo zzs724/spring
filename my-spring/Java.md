@@ -692,7 +692,43 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 - **编程式事务管理**：这意味你通过编程的方式管理事务，给你带来极大的灵活性，但是难维护。**代码手动实现 事务操作(提交，回滚)**
 - **声明式事务管理：**这意味着你可以将业务代码和事务管理分离，你只需用注解和XML配置来管理事务。
 
-### 六、BeanFactory和ApplicationContext区别
+### 六、BeanFactory和ApplicationContext
+
+##### 一、ApplicationContext常用实现类
+
+1. **ClassPathXmlApplicationContext**
+
+   ​	加载**类路径**下的配置文件。
+
+2. **FileSystemXmlApplicationContext**
+
+   ​	加载**任意路径**下的配置文件
+
+3. **AnnotationConfigApplicationContext**
+
+   ​	读取**注解**创建容器
+
+   
+
+
+
+
+
+
+
+##### 二、BeanFactory和ApplicationContext区别
+
+​	**1、创建bean的时机：**
+
+​		**BeanFactory：**采用延迟加载来创建Bean，当Bean被用到时才会创建。      项目启动时无法知道是否有Bean配置存在问题	   Bean为多例时比较好，用的时候才创建。
+
+​		**ApplicationContext：**在容器启动时创建所有的Bean。				Bean过多时，容器启动缓慢					Bean为单例时比较好，因为创建一个。
+
+
+
+
+
+
 
 ​	BeanFactory和ApplicationContext是Spring的两大核心接口。都可以作为Spring的容器
 
@@ -707,6 +743,8 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 5. BeanFactory和ApplicationContext都支持BeanPostProcessor、BeanFactoryPostProcessor的使用。BeanFactory需要手动注册，而ApplicationContext则是自动注册
 
 6. BeanFactory通常以编程的方式被创建，ApplicationContext还能以声明的方式创建，如使用ContextLoader
+
+   ##### 
 
    
 
@@ -1095,7 +1133,43 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 
 
+### 十四、创建Bean的三种方式
 
+##### 	一、默认使用构造函数创建
+
+```xml
+		<!-- 当HelloServiceImpl类中没有默认的空构造方法，初始化创建Bean时就会报错 -->
+		<bean id="helloService" class="com.zzs.service.impl.HelloServiceImpl" />
+```
+
+##### 	二、工厂的普通方法创建
+
+```java
+        public class MyFactory{
+            public IHelloService getHelloService(){
+                return new HelloServiceImpol();
+            }
+        }
+```
+
+```xml
+		<bean id="myFactory" class="com.zzs.MyFactory" />	
+		<bean id="helloService" factory-bean="myFactory" factory-method="getHelloService"/>
+```
+
+##### 	三、工厂的静态方法创建
+
+```java
+    	public class MyFactory{
+            public static IHelloService getHelloService(){
+                return new HelloServiceImpol();
+            }
+        }
+```
+```xml
+		<!-- 这种方式，方法必须是static的 -->
+		<bean id="helloService" class="com.zzs.MyFactory" factory-method="getHelloService/>	
+```
 
 
 
