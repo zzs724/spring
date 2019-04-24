@@ -706,15 +706,161 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 
 
+##### **3、依赖注入的方式：**
 
+1. **setter（）**：需要有默认的空构造方法
 
+   ```java
+   public class Car{
+       public String setColor(String color){
+           this.color = color;
+       }
+       public Car(){}
+   }
+   ```
 
+   ```xml
+   <bean id="" class="">
+   	<property name="color" value="red"/><!-- 对应set方法 -->
+   </bean>
+   ```
 
+2. **构造器**:可以保证在Bean实例化时就可以将值设置。
 
+   **（1）按类型匹配入参**
 
+   ```java
+   //带参构造方法
+   public Car(int maxSpeed,String brand, double price){
+       this.maxSpeed=maxSpeed;
+       this.brand=brand;
+       this.price=price;
+   }
+   ```
 
+   ```xml
+   <bean id="car1" class="com.spring.model.Car">  
+       <constructor-arg type="int" value="300"></constructor-arg>
+       <constructor-arg type="java.lang.String" value="宝马"></constructor-arg>
+       <constructor-arg type="double" value="300000.00"></constructor-arg>
+   </bean>
+   ```
 
+   **（2）按索引匹配入参**
 
+   ```xml
+   <!-- 构造函数注入(按索引匹配) -->
+   <bean id="car2" class="com.spring.model.Car"> 
+       <!-- 注意索引从0开始 --> 
+       <constructor-arg index="0" value="220"></constructor-arg>
+       <constructor-arg index="1" value="宝马"></constructor-arg>
+       <constructor-arg index="2" value="300000.00"></constructor-arg>
+   </bean>
+   ```
+
+   **（3）联合使用类型和索引匹配入参**
+
+   ```java
+   public Car(String brand, String corp,double price){
+       this.brand=brand;
+       this.corp=corp;
+       this.price=price;
+   }
+   
+   public Car(String brand, String corp,int maxSpeed){
+       this.brand=brand;
+       this.corp=corp;
+       this.maxSpeed=maxSpeed;
+   }
+   ```
+
+   ```xml
+   <!-- 构造函数注入(通过入参类型和位置索引确定对应关系) -->
+   <!-- 对应public Car(String brand, String corp,int maxSpeed)构造函数 -->
+   <bean id="car3" class="com.spring.model.Car">  
+       <constructor-arg index="0" type="java.lang.String" value="奔驰"></constructor-arg>
+       <constructor-arg index="1" type="java.lang.String" value="中国一汽"></constructor-arg>
+       <constructor-arg index="2" type="int" value="200"></constructor-arg>
+   </bean>
+   ```
+
+3. **注解**
+
+   开启注解功能：
+
+   ```xml
+   <context:annotation-config/>
+   ```
+
+   使用：@Autowired或@Resource
+
+   @Autowired
+
+   ```java
+   private ICommonDao commonDao;
+   @Resource
+   private IXxxxDao xxxxDao;
+   ```
+
+   **注：@Autowired：根据对象类型去匹配**
+
+   ​	**@Resource：根据名称去匹配，没有找到名称则会根据类型去匹配**
+
+##### 4、自动装配
+
+**autowire=" "**
+
+```xml
+<bean id="***" class="***" autowire="">
+```
+
+1. **不使用autowire设置，用默认值**
+
+   ```xml
+   <bean id="customer" class="com.lei.common.Customer">
+       <property name="person" ref="person" />
+   </bean>
+   <bean id="person" class="com.lei.common.Person" />
+   ```
+
+2. **使用autowire=*"byName"*:根据属性名person找相同的bean**
+
+   ```xml
+   <bean id="customer" class="com.lei.common.Customer" autowire="byName" />
+   <bean id="person" class="com.lei.common.Person" />
+   ```
+
+3. **使用autowire=*"byType"：根据class类型去找相同bean***
+
+   ```xml
+   <bean id="customer" class="com.lei.common.Customer" autowire="byType" />
+   <bean id="person" class="com.lei.common.Person" />
+   //当有多个Person的bean时会报错UnsatisfiedDependencyException
+   <bean id="person2" class="com.lei.common.Person" />
+   ```
+
+4. **使用autowire="constructor"：根据构造方法的参数去匹配**，**构造方法中的根据byType去匹配public Customer(Person person)**
+
+   ```xml
+   <bean id="customer" class="com.lei.common.Customer" autowire="constructor" />
+   <bean id="person" class="com.lei.common.Person" />
+   ```
+
+5. **使用autowire="autodetect"**根据情况自动去匹配
+
+6. **default：由上级标签<beans>的default-autowire属性确定**
+
+##### 5、注入集合
+
+```xml
+<bean>
+	<property>
+    	<list></list>
+        <map></map>
+        <set></set>
+    </property>
+</bean>
+```
 
 
 
