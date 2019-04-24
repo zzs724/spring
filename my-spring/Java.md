@@ -583,9 +583,13 @@ latch.await();//await()会阻塞当前线程，直到N变成零
         
         public Object myNewProxyInstance(Object target){
             this.target = target;
-            //第一个参数指定产生代理对象的类加载器，需要将其指定为和目标对象同一个类加载器  
+            //第一个参数指定产生代理对象的类加载器，需要将其指定为和目标对象同一个类加载器
+            
+           	//ClassLoader：类加载器， 用于加载代理对象字节码，和被代理对象使用相同的类加载器
+
         	//第二个参数要实现和目标对象一样的接口，所以只需要拿到目标对象的实现接口  
-        	//第三个参数表明这些被拦截的方法在被拦截时需要执行哪个InvocationHandler的invoke方法 
+            //		让代理对象拥有和被代理对象相同的方法。类似于实现相同的接口
+        	//第三个参数表明这些被拦截的方法在被拦截时需要执行哪个InvocationHandler的invoke方法 。   提供增强方法，可以匿名内部了实现
             return Proxy.newProxyInstance(target.getClass().getClassLoader(),target.getClass().getInterfaces(),this);
         }
         
