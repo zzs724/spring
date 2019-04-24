@@ -928,25 +928,35 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ##### 	1、**singleton** 
 
+​		单例
+
 ​		bean在每个Spring ioc 容器中只有一个实例。
 
 ​		在高并发下，如果bean中有全局变量，会存再线程安全问题。用ThreadLocal去解决
 
 ##### 	2、**prototype**
 
+​		多例
+
 ​		一个bean的定义可以有多个实例
 
 ##### 	3、**request**
 
+​		作用于web应用的请求范围
+
 ​		每一次http请求都会创建一个bean，仅基于web
 
 ##### 	4、**session**
+
+​		作用于web应用的会话范围
 
 ​		在一个HTTP Session中，一个bean定义对应一个实例
 
 ​		该作用域仅在基于web的Spring **ApplicationContext**情形下有效。
 
 ##### 	5、**global-session**
+
+​		作用于集群环境的会话范围（全局会话范围），当不是集群环境时，就是session
 
 ​		在一个全局的HTTP Session中，一个bean定义对应一个实例。
 
