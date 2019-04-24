@@ -517,7 +517,13 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
   线程A持有锁a，线程B持有锁b， A需要锁b，B需要锁a，但是锁 a和b都被占有，A和B相互等待。
 
-- ##### 3、防止死锁:,,- 破坏四个必要条件,- 线程的需求资源数小于等于总可用资源数,- 判断 系统安全状态 法。其实就是判断线程的需求资源是否大于目前可用资源
+- ##### 3、防止死锁:
+
+- ##### - 破坏四个必要条件,
+
+- ##### - 线程的需求资源数小于等于总可用资源数,
+
+- ##### - 判断 系统安全状态 法。其实就是判断线程的需求资源是否大于目前可用资源
 
 
 
@@ -655,8 +661,10 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 **AspectJ：静态代理**
 **AOP：动态代理**
 
-> ### 三、Spring的Bean单例与线程安全问题
->
+
+
+### 三、Spring的Bean单例与线程安全问题
+
 > ​	一个Bean如果是单例的，且在Bean中有全局变量context（全局变量是每个线程共享的资源，会存在并发问题）。
 >
 > ​	那么在多线程并发的情况下，当A线程进来将context的值设为自己的，这个是线程B也进来将context改成B的，这时候A的context的值也变成B的了。
@@ -670,6 +678,10 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 ```xml
  <context:annotation-config/>
 ```
+
+**@Autowired:根据name去匹配**
+
+**@Resource:根据类型去匹配，没有找到名称则会根据类型去匹配**
 
 ### 五、Spring支持的事务管理类型
 
@@ -704,9 +716,9 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ​		**依赖注入**。依赖spring容器把组件需要的资源注入。
 
+##### 3、依赖注入
 
-
-##### **3、依赖注入的方式：**
+###### **1、依赖注入的方式**
 
 1. **setter（）**：需要有默认的空构造方法
 
@@ -786,19 +798,23 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 3. **注解**
 
+   ### 当有多个相同类型的bean，可以**@Qualifier**去指定
+
    开启注解功能：
 
    ```xml
    <context:annotation-config/>
    ```
 
-   使用：@Autowired或@Resource
+   **使用：@Autowired或@Resource**
 
-   @Autowired
+   **@Autowired**
 
    ```java
    private ICommonDao commonDao;
+   
    @Resource
+   
    private IXxxxDao xxxxDao;
    ```
 
@@ -806,7 +822,9 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
    ​	**@Resource：根据名称去匹配，没有找到名称则会根据类型去匹配**
 
-##### 4、自动装配
+###### 2、自动装配
+
+​	**不能自动注入 基本数据类型，String字**
 
 **autowire=" "**
 
@@ -850,7 +868,7 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 6. **default：由上级标签<beans>的default-autowire属性确定**
 
-##### 5、注入集合
+###### 3、注入集合
 
 ```xml
 <bean>
@@ -861,6 +879,217 @@ latch.await();//await()会阻塞当前线程，直到N变成零
     </property>
 </bean>
 ```
+
+
+
+### 八、Bean的作用域
+
+##### 	1、**singleton** 
+
+​		bean在每个Spring ioc 容器中只有一个实例。
+
+​		在高并发下，如果bean中有全局变量，会存再线程安全问题。用ThreadLocal去解决
+
+##### 	2、**prototype**
+
+​		一个bean的定义可以有多个实例
+
+##### 	3、**request**
+
+​		每一次http请求都会创建一个bean，仅基于web
+
+##### 	4、**session**
+
+​		在一个HTTP Session中，一个bean定义对应一个实例
+
+​		该作用域仅在基于web的Spring **ApplicationContext**情形下有效。
+
+##### 	5、**global-session**
+
+​		在一个全局的HTTP Session中，一个bean定义对应一个实例。
+
+​		该作用域仅在基于web的Spring **ApplicationContext**情形下有效
+
+### 九、Spring如何集成Hibernate
+
+​	**用Spring的 SessionFactory 调用 LocalSessionFactory**
+
+1. 配置 Hibernate SessionFactory
+2. 写一个Dao继承HibernateDaoSupport（还可以在Dao中使用Hibernate Template）
+3. 在AOP支持的事务中配置
+
+
+
+### 十、Spring事务
+
+##### 	一、Spring支持的两种事务管理
+
+###### 		1、编程式事务管理：使用TransactionTemplate实现
+
+```xml
+        <bean id="transactionManager"
+              class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+            <property name="dataSource" ref="dataSource"/>
+        </bean>
+
+        <bean id="transactionTemplate"
+              class="org.springframework.transaction.support.TransactionTemplate">
+            <property name="transactionManager">
+                <ref bean="transactionManager"/>
+            </property>
+        </bean>
+```
+
+```java
+        @Autowired
+        private TransactionTemplate transactionTemplate;
+        PayOrder order = (PayOrder) this.transactionTemplate  
+                     .execute(new TransactionCallback() {  
+                         @Override  
+                         public Object doInTransaction(TransactionStatus status) {  
+                             // 查看是否已经存在支付订单，如果已经存在则返回订单主键  
+                             PayOrder payOrderTemp = payOrderDAO.findOrder(String  
+                                     .valueOf(payOrder.getPayOrderId()));  
+
+                             // 由支付渠道类型(PayChannelType)转换得到交易类型(PayType)  
+                             if (payOrder.getPayChannelId().equalsIgnoreCase(PAY_CHNL_ACT_BAL)) {// 账户余额支付  
+                                 payOrder.setPayType("3");  
+                             } else if (payOrder.getPayChannelId().equalsIgnoreCase(PAY_CHNL_FAST_PAY)) {// 联通快捷支付  
+                                 payOrder.setPayType("4");  
+                             } else {// 网银网关支付  
+                                 payOrder.setPayType("2");  
+                             }  
+
+                             // 比对新的支付金额与原订单金额是否一致，如不一致则提示错误  
+                             if (payOrderTemp == null) {  
+                                 String orderId = payOrderDAO.save(payOrder);  
+                                 payOrder.setPayOrderId(orderId);  
+                                 return payOrder;  
+                             } else {  
+                                 return payOrderTemp;  
+                             }  
+                         }  
+                     });  
+```
+
+
+
+###### 		2、声明式事务管理：通过配置文件中配置tx:advice/      aop:config/ 或者使用@Transactional注解
+
+```xml
+		<tx:annotation-driven transaction-manager="transactionManager"/>        
+		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
+            <property name="dataSource" ref="dataSource" />  
+            <property name="configLocation">  
+                <value>classpath:mybatis-config.xml</value>  
+            </property>  
+        </bean> 
+
+        <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+            <property name="dataSource" ref="dataSource" />  
+        </bean>         
+        <tx:advice id="advice" transaction-manager="transactionManager">  
+            <tx:attributes>  
+                <tx:method name="update*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception"/>  
+                <tx:method name="insert" propagation="REQUIRED" read-only="false"/>  
+            </tx:attributes>  
+        </tx:advice>  
+
+        <aop:config>  
+            <aop:pointcut id="testService" expression="execution (* com.nnngu.service.MyBatisService.*(..))"/>  
+            <aop:advisor advice-ref="advice" pointcut-ref="testService"/>  
+        </aop:config>  
+```
+
+
+
+##### 	二、事务传播行为
+
+1. **REQUIRED：**<u>默认值。如果当前存在事务，则加入事务，如果不存在则新建事务</u>。
+2. **REQUIRED_NEW：**<u>如果当前存在事务，把当前事务挂起，另起一个新的事务。无则新建事务</u>
+3. **SUPPORTS：**<u>如果当前存在事务，则加入事务；若不存在则以非事务方式执行。</u>
+4. **NOT_SUPPORTED:**<u>以非事务方式运行，若当前存在事务，将当前事务挂起。</u>
+5. **NEVER：**<u>以非事务方式运行，若当前存在事务则抛异常</u>
+6. **MANDATORY：**<u>必须有事务。如果当前存在事务，则加入事务。没有事务则抛异常</u>
+7. **NESTED：**<u>如果当前存在事务，创建一个新的事务作为当前事务的嵌套事务运行。**没有事务则以REQUIRED方式运行**</u>
+
+
+
+##### 	三、事务隔离级别
+
+​	**脏读：**           ------------事务A读取了 事务B尚未提交的数据。
+
+​	**不可重复读：**------------（数据被修改）事务A在执行过程中多次查询结果不一致。并发事务中：在事务A查询过程中，数据被其他并行事务修改了。        **重点是update**
+
+​	**幻读：**           ------------（数据被新增或删除）事务A执行过程中多次查询结果不一致。                                                                                                        **重点是insert和delete**
+
+ 									并发事务中：在事务A查询过程中，其他事务对该表insert或delete操作。
+
+
+
+1. **DEFAULT：**<u>使用底层数据库的默认隔离级别。大部分数据是：READ_COMMITTED</u>
+
+2. **READ_COMMITTED：**<u>表示一个事务只能读取另一个事务已提交的数据。</u>                                                             **防止脏读。但可能有不可重复读和幻读**
+
+3. **READ_UNCOMMITTED:**<u>表示一个事务可以读取另一个事务已修改但未提交的数据。</u>                                            **产生脏读，不可重复读和幻读**
+
+4. **REPEATABLE_READ（可重复读）：**<u>一个事务在整个过程中可以重复执行某个查询，且每次结果相同。</u>            **防止不可重复读和脏读。有可能幻读**
+
+   ​           						  只能读取提交的数据                                					            
+
+5. **SERIALIZABLE：**<u>所有事务挨个顺序执行，互不影响。</u>级别最高，代价最高                                                          **防止脏读、不可重复读、幻读**
+
+   
+
+### 十一、Spring的AOP
+
+##### 	1、什么是AOP
+
+​		AOP，一般称为面向切面，作为面向对象的一种补充，用于将那些与业务无关，但却对多个对象产生影响的**公共行为和逻辑，抽取并封装为一个可重用的模块**，
+
+​		**这个模块被命名为“切面”（Aspect）**，减少系统中的重复代码，降低了模块间的耦合度，同时提高了系统的可维护性。可用于权限认证、日志、事务处理
+
+
+
+##### 	2、AOP的实现
+
+​		AOP的实现关键在于代理模式。AOP分为静态代理和动态代理。AspectJ为静态代理的代表。Spring AOP为动态代理：JDK动态代理和CGLIB动态代理
+
+​		**JDK动态代理：**只提供接口的代理。核心InvocationHandler接口和Proxy类。代理类通过invoke()方法来调用目标类的代码。
+
+​		**CGLIB动态代理：**通过继承的方式做的动态代理。如果某各类被标记为final，是无法实现CGLIB动态代理的。final修饰的方法无法被代理。
+
+
+
+### 十二、Spring Bean的生命周期
+
+
+
+
+
+
+
+
+
+
+
+### 十三、Spring中的设计模式
+
+1. ​	工厂模式：BeanFactory就是简单工厂模式的体现，用来创建对象的实例；
+
+2. ​	单例模式：Bean默认为单例模式。
+
+3. ​	代理模式：Spring的AOP功能用到了JDK的动态代理和CGLIB字节码生成技术；
+
+4. ​	模板方法：用来解决代码重复的问题。比如. RestTemplate, JmsTemplate, JpaTemplate
+
+5. ​	观察者模式：定义对象键一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都会得到通知被制动更新，
+
+   ​                              如Spring中listener的实现--ApplicationListener。
+
+
+
+
 
 
 
