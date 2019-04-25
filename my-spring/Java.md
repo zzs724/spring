@@ -1170,7 +1170,16 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 <aop:config>
     <aop:aspect id="logAdvice" ref="logger">
     	<aop:before method="printLog" pointcut="execution(* com..save*(..))" />
+        <!-- 或者：
+ 			<aop:after method="afterPrintLog" pointcut-ref="advice" />
+            <aop:pointcut id="advice" expression="execution(* com..save*(..))"/>
+			aop：pointcut卸载aop:aspect内部，就只有当前aop:aspect使用
+		-->
     </aop:aspect>
+     	<!-- 或者：
+            <aop:pointcut id="advice" expression="execution(* com..save*(..))"/>
+			aop：pointcut卸载aop:aspect外部，所有aop:aspect都可使用
+		-->
 </aop:config>
     
 ```
