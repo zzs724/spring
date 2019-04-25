@@ -1239,9 +1239,21 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 4. ​	模板方法：用来解决代码重复的问题。比如. RestTemplate, JmsTemplate, JpaTemplate
 
-5. ​	观察者模式：定义对象键一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都会得到通知被制动更新，
+5. ​	观察者模式：定义对象键一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都会得到通知被制动更新， 
 
-   ​                              如Spring中listener的实现--ApplicationListener。
+   ​			如Spring中listener的实现--ApplicationListener。
+
+6. ​	适配器（Adapter）：对AOP的处理中。MethodInterceptor    。HandlerAdatper根据Handler规则执行不同的Handler
+
+7. ​	装饰器模式：Spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator
+
+8. fff
+
+9. ff
+
+10. fff
+
+   
 
 
 
