@@ -56,7 +56,10 @@
             <aop:after method="afterPrintLog" pointcut="execution(* com..save*(..))" />
             <!--<aop:around method="arountPrintLog" pointcut="execution(* com..save*(..))" />-->
             <aop:after-throwing method="afterThrowPrintLog" pointcut="execution(* com..save*(..))" />
-
+            <!-- 或者
+            <aop:after method="afterPrintLog" pointcut-ref="advice" />
+            <aop:pointcut id="advice" expression="execution(* com..save*(..))"/>
+            -->
         </aop:aspect>
     </aop:config>
 
