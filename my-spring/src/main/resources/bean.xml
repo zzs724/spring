@@ -29,8 +29,8 @@
                 id:给切面提供id
                 ref：通知类的id
          -->
-        <!-- 或者  所有aop:aspect可用
 
+        <!--   所有aop:aspect可用
         <aop:pointcut id="advice" expression="execution(* com..save*(..))"/>
         -->
         <aop:aspect id="logAdvice" ref="logger">

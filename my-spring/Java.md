@@ -1131,9 +1131,11 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ​	Advice（通知/增强）：指拦截到Joinpoint之后需要做的事情就是通知。也可以说是处理Poincut就是Advice
 
-​			通知类型：前置通知(before)、后置通知(after-return)、异常通知(after-throwing)、最终通知(after)、环绕通知(around)（可以说是前面几种的结合）
+​			通知类型：前置通知(before)、后置通知(after)、异常通知(after-throwing)、返回通知(after-return)、环绕通知(around)（可以说是前面几种的结合）
 
-​			后置通知和异常通知只执行一个
+​			返回通知：在方法返回结果之后执行 
+
+​			环绕通知(around)：ProceedingJoinPoint
 
 ​	Target（目标对象）：被代理类。
 
