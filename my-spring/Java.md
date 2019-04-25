@@ -1131,7 +1131,9 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ​	Advice（通知/增强）：指拦截到Joinpoint之后需要做的事情就是通知。也可以说是处理Poincut就是Advice
 
-​			通知类型：前置通知、后置通知、异常通知、最终通知、环绕通知（整个）
+​			通知类型：前置通知(before)、后置通知(after-return)、异常通知(after-throwing)、最终通知(after)、环绕通知(around)（可以说是前面几种的结合）
+
+​			后置通知和异常通知只执行一个
 
 ​	Target（目标对象）：被代理类。
 
@@ -1142,6 +1144,38 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 ​	Proxy（代理）：代理类
 
 ​	Aspect（切面）：切入点和通知的结合
+
+写法：
+
+```xml
+<!-- 在aop：aspect内部配置通知类型
+                method:指定logger中的哪个方法
+                pointcut:切入点表达式，表示对业务层中的哪些方法增强
+                        写法：execution
+                        表达式： 访问修饰符  返回值  包名.包名...类名.方法名(参数列表)
+                      例：       public       void   com.zzs.service.impl.AccountServiceImpl.saveAccount（）
+                      访问修饰符可省略 public
+                      包名可以：包名.包名.包名    -> *.*.*.*.AccountServiceImpl.saveAccount（）
+                      包名可以使用 ..  表示当前包及其子包 com.*..AccountServiceImpl.saveAccount（）
+                      类名和方法名也可以用*:  execution(* com.*..*.*())
+                      参数列表：
+                            基本类型直接写：8中基本类型
+                            引用类型： 包名.类名  java.lang.String    com.zzs.entity.User
+                            也可用 通配符* ，标注的方法是必须有参数的,execution(* com..save*(*))
+                            也可以用 .. 表示有无参数都可以execution(* com..save*(..))
+                      通配符写法：execution（* com.zzs.service...*.save*(..)）
+
+                pointcut-ref:
+             -->
+<aop:config>
+    <aop:aspect id="logAdvice" ref="logger">
+    	<aop:before method="printLog" pointcut="execution(* com..save*(..))" />
+    </aop:aspect>
+</aop:config>
+    
+```
+
+
 
 ### 十二、Spring Bean的生命周期
 

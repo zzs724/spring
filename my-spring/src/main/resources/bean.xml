@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
     <!-- 默认使用构造方法创建，必须有空的构造方法 -->
     <!--<bean id="helloService" class="com.zzs.service.impl.HelloServiceImpl" />-->
     <!-- 非静态方法 -->
@@ -11,5 +15,49 @@
     -->
 
     <!-- 静态方法创建 -->
-    <bean id="helloService" class="com.zzs.factory.MyFactory" factory-method="getHelloService"/>
+    <!--<bean id="helloService" class="com.zzs.factory.MyFactory" factory-method="getHelloService"/>-->
+
+    <!-- IOC配置 -->
+    <bean id="accountService" class="com.zzs.service.impl.AccountServiceImpl"/>
+    <!-- AOP配置
+        1、把通知Bean交给spring容器管理
+     -->
+    <bean id="logger" class="com.zzs.utils.Logger"/>
+    <!-- 2、使用aop：config标签表明开始AOP配置 -->
+    <aop:config>
+        <!-- 3、使用aop：aspect配置切面
+                id:给切面提供id
+                ref：通知类的id
+         -->
+        <aop:aspect id="logAdvice" ref="logger">
+            <!-- 4、在aop：aspect内部配置通知类型
+                method:指定logger中的哪个方法
+                pointcut:切入点表达式，表示对业务层中的哪些方法增强
+                        写法：execution
+                        表达式： 访问修饰符  返回值  包名.包名...类名.方法名(参数列表)
+                      例：       public       void   com.zzs.service.impl.AccountServiceImpl.saveAccount（）
+                      访问修饰符可省略 public
+                      包名可以：包名.包名.包名    -> *.*.*.*.AccountServiceImpl.saveAccount（）
+                      包名可以使用 ..  表示当前包及其子包 com.*..AccountServiceImpl.saveAccount（）
+                      类名和方法名也可以用*:  execution(* com.*..*.*())
+                      参数列表：
+                            基本类型直接写：8中基本类型
+                            引用类型： 包名.类名  java.lang.String    com.zzs.entity.User
+                            也可用 通配符* ，标注的方法是必须有参数的,execution(* com..save*(*))
+                            也可以用 .. 表示有无参数都可以execution(* com..save*(..))
+                      通配符写法：execution（* com.zzs.service...*.save*(..)）
+
+                pointcut-ref:
+             -->
+            <!--<aop:before method="printLog" pointcut="execution(public void com.zzs.service.impl.AccountServiceImpl.saveAccount())" />-->
+            <!--<aop:before method="printLog" pointcut="execution(* com.zzs.service..*.save*())" />-->
+            <aop:before method="beforePrintLog" pointcut="execution(* com..save*(..))" />
+            <aop:after-returning method="afterReturnPrintLog" pointcut="execution(* com..save*(..))" />
+            <aop:after method="afterPrintLog" pointcut="execution(* com..save*(..))" />
+            <!--<aop:around method="arountPrintLog" pointcut="execution(* com..save*(..))" />-->
+            <aop:after-throwing method="afterThrowPrintLog" pointcut="execution(* com..save*(..))" />
+
+        </aop:aspect>
+    </aop:config>
+
 </beans>
