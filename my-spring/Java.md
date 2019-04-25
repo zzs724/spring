@@ -746,7 +746,7 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 6. BeanFactory通常以编程的方式被创建，ApplicationContext还能以声明的方式创建，如使用ContextLoader
 
-   ##### 
+   
 
    
 
@@ -1123,7 +1123,25 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ​		**CGLIB动态代理：**通过继承的方式做的动态代理。如果某各类被标记为final，是无法实现CGLIB动态代理的。final修饰的方法无法被代理。
 
+##### 3、AOP相关术语
 
+​	Joinpoint（连接点）：指被拦截到的点。在spring中连接点其实就是目标类中的方法。业务层中所有的方法。
+
+​	Pointcut（切入点）：需要增强的方法。也就是需要AOP代理处理的方法。
+
+​	Advice（通知/增强）：指拦截到Joinpoint之后需要做的事情就是通知。也可以说是处理Poincut就是Advice
+
+​			通知类型：前置通知、后置通知、异常通知、最终通知、环绕通知（整个）
+
+​	Target（目标对象）：被代理类。
+
+​	Weaving（织入）：指把增强应用到目标对象 来创建 代理对象的过程
+
+​					spring采用动态代理织入，而AspectJ采用编译期和类装载期织入（静态代理）
+
+​	Proxy（代理）：代理类
+
+​	Aspect（切面）：切入点和通知的结合
 
 ### 十二、Spring Bean的生命周期
 
