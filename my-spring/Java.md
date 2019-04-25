@@ -1033,7 +1033,8 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 ###### 		2、声明式事务管理：通过配置文件中配置tx:advice/      aop:config/ 或者使用@Transactional注解
 
 ```xml
-		<tx:annotation-driven transaction-manager="transactionManager"/>        
+		<tx:annotation-driven transaction-manager="transactionManager"/> <!-- 注解方式 -->
+		
 		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
             <property name="dataSource" ref="dataSource" />  
             <property name="configLocation">  
@@ -1043,8 +1044,11 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
         <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
             <property name="dataSource" ref="dataSource" />  
-        </bean>         
-        <tx:advice id="advice" transaction-manager="transactionManager">  
+        </bean>   
+
+
+		<!-- xml方式  配置事务通知-->
+        <tx:advice id="txAdvice" transaction-manager="transactionManager">  
             <tx:attributes>  
                 <tx:method name="update*" propagation="REQUIRED" read-only="false" rollback-for="java.lang.Exception"/>  
                 <tx:method name="insert" propagation="REQUIRED" read-only="false"/>  
@@ -1053,7 +1057,8 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
         <aop:config>  
             <aop:pointcut id="testService" expression="execution (* com.nnngu.service.MyBatisService.*(..))"/>  
-            <aop:advisor advice-ref="advice" pointcut-ref="testService"/>  
+            <!-- 建立事务通知和切入点的关系-->
+            <aop:advisor advice-ref="txAdvice" pointcut-ref="testService"/>  
         </aop:config>  
 ```
 
@@ -1194,7 +1199,29 @@ latch.await();//await()会阻塞当前线程，直到N变成零
 
 ​	2、多例对象生命周期：容器启动后，当使用bean对象时，创建bean对象，当对象长时间不用且没有对象引用，有GC回收
 
+  **生命周期详解：**
 
+   1、实例化一个Bean－－也就是我们常说的new；
+
+​    2、按照Spring上下文对实例化的Bean进行配置－－也就是IOC注入；
+
+​    3、如果这个Bean已经实现了BeanNameAware接口，会调用它实现的setBeanName(String)方法，此处传递的就是Spring配置文件中Bean的id值
+
+​    4、如果这个Bean已经实现了BeanFactoryAware接口，会调用它实现的setBeanFactory(setBeanFactory(BeanFactory)传递的是Spring工厂自身（可以用这个方式来获取其它Bean，只需在Spring配置文件中配置一个普通的Bean就可以）；
+
+​    5、如果这个Bean已经实现了ApplicationContextAware接口，会调用setApplicationContext(ApplicationContext)方法，传入Spring上下文（同样这个方式也可以实现步骤4的内容，但比4更好，因为ApplicationContext是BeanFactory的子接口，有更多的实现方法）；
+
+​    6、如果这个Bean关联了BeanPostProcessor接口，将会调用postProcessBeforeInitialization(Object obj, String s)方法，BeanPostProcessor经常被用作是Bean内容的更改，并且由于这个是在Bean初始化结束时调用那个的方法，也可以被应用于内存或缓存技术；
+
+​    7、如果Bean在Spring配置文件中配置了init-method属性会自动调用其配置的初始化方法。
+
+​    8、如果这个Bean关联了BeanPostProcessor接口，将会调用postProcessAfterInitialization(Object obj, String s)方法、；
+
+​    注：以上工作完成以后就可以应用这个Bean了，那这个Bean是一个Singleton的，所以一般情况下我们调用同一个id的Bean会是在内容地址相同的实例，当然在Spring配置文件中也可以配置非Singleton，这里我们不做赘述。
+
+​    9、当Bean不再需要时，会经过清理阶段，如果Bean实现了DisposableBean这个接口，会调用那个其实现的destroy()方法；
+
+​    10、最后，如果这个Bean的Spring配置中配置了destroy-method属性，会自动调用其配置的销毁方法。
 
 
 
