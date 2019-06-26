@@ -1,0 +1,76 @@
+1、两者都是REQUIRED
+	当ServiceB().B()抛异常时，A()和B()两个事务都会回滚，并抛出：UnexpectedRollbackException: Transaction rolled back because it has been marked as rollback-only
+2、A是REQUIRED，B是REQUIRES_NEW
+	当ServiceB().B()抛异常时，B()回滚而A()不会回滚
+	public void ServiceA(){
+		public void A(){
+			insertA();
+			try{
+				ServiceB().B();
+			}catch(Exception e){
+
+			}
+		}
+	}
+	public void ServiceB(){
+		public void B(){
+			insertB();
+			int i = 1/0;
+		}
+	}
+
+3、两者都是REQUIRED
+	 执行完insertA()和ServiceB().B()后，抛异常：两者都回滚，因为两者是同一事务
+4、A是REQUIRED，B是REQUIRES_NEW：执行完insertA()和ServiceB().B()后，抛异常：A会回滚，而B不会回滚，因为两者不是同一事务
+	public void ServiceA(){
+		public void A(){
+			insertA();
+			ServiceB().B();
+			int i = 1/0;
+		}
+	}
+	public void ServiceB(){
+		public void B(){
+			insertB();
+		}
+	}
+-------------------------
+5、同一个ServiceA中，A()调用B()，
+	a、当A（）无事务，B（）有事务时：这时候B（）事务不会生效，
+	b、当A（）添加REQUIRED，B（）不添加事务时：B会加入A的事务中，所以都会回滚
+	c、当A（）添加RREQUIRES_NEW，B（）不添加事务时：同b情况
+以上其实是一种情况：B（）的事务是跟随A（）的事务
+			因为srping事务就是springAOP的体现，事务可以认为对方法本身的一种加强，那么要开启这种加强，就要代理对象，
+			那么大家看代码，A（）中的B（）被谁调用呢？是this！！（同类中不同方法的调用默认就是this）也就是目标对象，
+			并不是代理对象，也就不能使用AOP代理，自然就开启不了事务，B（）的事务自然不会生效
+	public void ServiceA(){
+		public void A(){
+			insertA();
+			try{
+				B()；
+			}catch(Exception e){
+			}
+		}
+		public void B(){
+			insertA();
+			int i = 1/0;
+		}
+	}
+
+6、如果想让B（）事务生效需要进行两处修改：
+	a、配置文件添加<aop:aspectj-autoproxy expose-proxy="true"/>
+	b、((ServiceA) AopContext.currentProxy()).B();
+这样A（）和B（）的事务配置都会生效，就如何A（）和B（）是在两个Service中一样
+	public void ServiceA(){
+		public void A(){
+			insertA();
+			try{
+				((ServiceA) AopContext.currentProxy()).B();
+			}catch(Exception e){	
+			}
+		}
+		public void B(){
+			insertA();
+			int i = 1/0;
+		}
+	}
